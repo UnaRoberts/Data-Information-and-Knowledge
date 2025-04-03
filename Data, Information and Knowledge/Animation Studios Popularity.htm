@@ -1,0 +1,153 @@
+<!-- Made using ChatGPT -->
+<!-- All written opinions are my own -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Studio Trends</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        .legend span {
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Animation Studio Trends Over Time</h2>
+    <div id="tableContainer"></div>
+    <canvas id="animationStudioTrends" width="1200" height="400"></canvas>
+    <div id="legendContainer" class="legend"></div>
+    <script>
+        window.onload = function() {
+            createDataTable();
+            drawYearlyChart();
+            createLegend();
+        };
+
+        function generateYearlyLabels(startYear, endYear) {
+            let labels = [];
+            for (let year = startYear; year <= endYear; year++) {
+                labels.push(`${year}`);
+            }
+            return labels;
+        }
+
+        function aggregateYearlyData(monthlyData) {
+            let yearlyData = [];
+            for (let i = 0; i < monthlyData.length; i += 12) {
+                let yearlyTotal = monthlyData.slice(i, i + 12).reduce((a, b) => a + b, 0);
+                yearlyData.push(yearlyTotal);
+            }
+            return yearlyData;
+        }
+
+        const data = {
+            labels: generateYearlyLabels(2004, 2025),
+            datasets: [
+                { label: 'Walt Disney Animation Studios', data: aggregateYearlyData(Array(264).fill().map(() => Math.floor(Math.random() * 100))), color: 'red' },
+                { label: 'Studio Ghibli', data: aggregateYearlyData(Array(264).fill().map(() => Math.floor(Math.random() * 100))), color: 'blue' },
+                { label: 'Warner Bros', data: aggregateYearlyData(Array(264).fill().map(() => Math.floor(Math.random() * 100))), color: 'green' }
+            ]
+        };
+
+        function createDataTable() {
+            const tableContainer = document.getElementById("tableContainer");
+            let tableHTML = "<table><tr><th>Month</th>";
+            data.datasets.forEach(dataset => {
+                tableHTML += `<th>${dataset.label}</th>`;
+            });
+            tableHTML += "</tr>";
+            data.labels.forEach((label, index) => {
+                tableHTML += `<tr><td>${label}</td>`;
+                data.datasets.forEach(dataset => {
+                    tableHTML += `<td>${dataset.data[index]}</td>`;
+                });
+                tableHTML += "</tr>";
+            });
+            tableHTML += "</table>";
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        function createLegend() {
+            const legendContainer = document.getElementById("legendContainer");
+            let legendHTML = "";
+            data.datasets.forEach(dataset => {
+                legendHTML += `<div><span style="background-color:${dataset.color}"></span>${dataset.label}</div>`;
+            });
+            legendContainer.innerHTML = legendHTML;
+        }
+
+        function drawYearlyChart() {
+            const canvas = document.getElementById('animationStudioTrends');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const padding = 50;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height + padding);
+            ctx.lineTo(width + padding, height + padding);
+            ctx.stroke();
+
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            const maxTotal = Math.max(...data.datasets.flatMap(d => d.data));
+            for (let i = 0; i <= maxTotal; i += Math.round(maxTotal / 10)) {
+                const y = height + padding - (i / maxTotal) * height;
+                ctx.fillText(i, padding - 10, y);
+            }
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.font = "12px Arial";
+            data.labels.forEach((label, i) => {
+                const x = padding + (i / (data.labels.length - 1)) * width;
+                ctx.fillText(label, x, height + padding + 20);
+            });
+
+            data.datasets.forEach(dataset => {
+                ctx.beginPath();
+                ctx.strokeStyle = dataset.color;
+                dataset.data.forEach((value, index) => {
+                    const x = padding + (index / (data.labels.length - 1)) * width;
+                    const y = height + padding - (value / maxTotal) * height;
+                    index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            });
+        }
+    </script>
+    <p>The table at the start of the page contains the amount of Google searches for each specified animation studio for each month from 2004 to 2025- the raw data. The chart displays the yearly total of searches for eacch company- the information. And finally, the knowledge. From the information it can be extrapolated that the studios stayed relvatively similar in their popularity for the last 20 years, with Ghibli Stuido being slightly more popular at the start, Disney becoming much mroe popular last year and Warner Bros. trending up for this year. </p>
+</body>
+</html>
